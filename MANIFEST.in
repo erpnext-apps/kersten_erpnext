@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include kersten_erpnext *.css
+recursive-include kersten_erpnext *.csv
+recursive-include kersten_erpnext *.html
+recursive-include kersten_erpnext *.ico
+recursive-include kersten_erpnext *.js
+recursive-include kersten_erpnext *.json
+recursive-include kersten_erpnext *.md
+recursive-include kersten_erpnext *.png
+recursive-include kersten_erpnext *.py
+recursive-include kersten_erpnext *.svg
+recursive-include kersten_erpnext *.txt
+recursive-exclude kersten_erpnext *.pyc
