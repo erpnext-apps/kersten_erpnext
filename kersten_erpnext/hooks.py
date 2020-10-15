@@ -44,6 +44,8 @@ app_license = "MIT"
 # application home page (will override Website Settings)
 # home_page = "login"
 
+update_website_context = ["kersten_erpnext.templates.generators.item.item.set_page_blocks"]
+
 # website user home page (by Role)
 # role_home_page = {
 #	"Role": "home_page"
@@ -142,4 +144,22 @@ app_license = "MIT"
 # exempt linked doctypes from being automatically cancelled
 #
 # auto_cancel_exempted_doctypes = ["Auto Repeat"]
+
+fixtures = [
+		{	"dt":"Custom Field",
+			"filters": [["name", "in", [
+				"Item-page_building_blocks",
+				"Item-website_content_section",
+				"Item-section_break_139",
+				"Item-full_width",
+				"Item-column_break_137",
+				"Item-content_type"
+				"Web Page Block-copy_from_doctype",
+				"Web Page Block-copy_from_doctype"
+		]]]
+		},
+		{"dt":"Custom Script", "filters": [["name", "in", [
+				"Item-Client",
+		]]]},
+]
 
