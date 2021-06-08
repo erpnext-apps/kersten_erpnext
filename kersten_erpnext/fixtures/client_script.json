@@ -1,7 +1,7 @@
 [
  {
   "docstatus": 0,
-  "doctype": "Custom Script",
+  "doctype": "Client Script",
   "dt": "Item",
   "enabled": 1,
   "modified": "2020-10-15 13:49:07.918548",
