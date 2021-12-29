@@ -21,7 +21,9 @@ def execute():
 
 	create_custom_fields(custom_fields)
 
-	items = frappe.get_all('Website Item', fields=['name', 'item_code'])
+	items = frappe.get_all('Website Item',
+		fields=['name', 'item_code'], filters={'has_variants': 0})
+
 	for item in items:
 		blocks = frappe.get_all('Web Page Block', fields = ['add_bottom_padding', 'add_container',
 			'add_shade', 'add_top_padding', 'hide_block', 'idx', 'web_template', 'web_template_values', 'owner', 'css_class'],
