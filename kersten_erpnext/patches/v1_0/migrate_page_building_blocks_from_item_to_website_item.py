@@ -27,10 +27,9 @@ def execute():
 			'add_shade', 'add_top_padding', 'hide_block', 'idx', 'web_template', 'web_template_values', 'owner', 'css_class'],
 			filters = {'parent': item.item_code, 'parenttype': 'Item'})
 
-		if blocks:
-			doc = frappe.get_doc('Website Item', item.name)
-			doc.content_type = frappe.db.get_value('Item', item.item_code, 'content_type')
-			for block in blocks:
-				doc.append('page_building_blocks', block)
-			doc.flags.ignore_validate = True
-			doc.save()
+		doc = frappe.get_doc('Website Item', item.name)
+		doc.content_type = frappe.db.get_value('Item', item.item_code, 'content_type')
+		for block in blocks:
+			doc.append('page_building_blocks', block)
+		doc.flags.ignore_validate = True
+		doc.save()
