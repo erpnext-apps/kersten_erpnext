@@ -3,6 +3,7 @@ from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 
 def execute():
 	frappe.reload_doc('e_commerce', 'doctype' ,'website_item')
+	frappe.reload_doc('stock', 'doctype' ,'item')
 
 	custom_fields = {
 		'Website Item': [
@@ -20,6 +21,8 @@ def execute():
 	}
 
 	create_custom_fields(custom_fields)
+	frappe.db.sql("""update `tabItem` set published_in_website = 1
+		where has_variants=1""")
 
 	items = frappe.get_all('Website Item',
 		fields=['name', 'item_code'], filters={'has_variants': 0})
