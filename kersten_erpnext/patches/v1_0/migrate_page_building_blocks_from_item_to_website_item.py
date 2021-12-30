@@ -31,6 +31,7 @@ def execute():
 
 		doc = frappe.get_doc('Website Item', item.name)
 		doc.content_type = frappe.db.get_value('Item', item.item_code, 'content_type')
+		doc.full_width = frappe.db.get_value('Item', item.item_code, 'full_width')
 		for block in blocks:
 			doc.append('page_building_blocks', block)
 		doc.flags.ignore_validate = True
