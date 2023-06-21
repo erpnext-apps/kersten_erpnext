@@ -25,6 +25,30 @@
 		{% endif %}
 	</div>
 </div>
+
+<div class="item-content {{ 'mt-minus-2' if (show_tabs and tabs) else '' }}">
+	<div class="product-page-content">
+		<!-- Product Specifications Table Section -->
+		{% if show_tabs and tabs %}
+			<div class="category-tabs">
+				<!-- tabs -->
+					{{ web_block("Section with Tabs", values=tabs, add_container=0,
+						add_top_padding=0, add_bottom_padding=0)
+					}}
+			</div>
+		{% elif website_specifications %}
+			{% include "templates/generators/item/item_specifications.html"%}
+		{% endif %}
+
+		<!-- Advanced Custom Website Content -->
+		{{ doc.website_content or '' }}
+
+		<!-- Reviews and Comments -->
+		{% if shopping_cart.cart_settings.enable_reviews and not doc.has_variants %}
+			{% include "templates/generators/item/item_reviews.html"%}
+		{% endif %}
+	</div>
+</div>
 {% endblock %}
 
 {% block base_scripts %}
