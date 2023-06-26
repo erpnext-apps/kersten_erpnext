@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-import frappe
+
 from frappe.website.doctype.web_page.web_page import get_web_blocks_html
 
 
