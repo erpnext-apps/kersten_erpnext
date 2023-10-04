@@ -2,7 +2,6 @@
 // MIT License. See license.txt
 
 frappe.ready(function() {
-    console.log("helloooooooooo")
 	if(frappe.utils.get_url_arg('subject')) {
 	  $('[name="subject"]').val(frappe.utils.get_url_arg('subject'));
 	}
