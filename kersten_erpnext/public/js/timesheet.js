@@ -1,8 +1,8 @@
 frappe.ui.form.on('Timesheet Detail', {
-	custom_time: function(frm, cdt, cdn) {
+	time: function(frm, cdt, cdn) {
 		let d = locals[cdt][cdn];
 		let date = d.date
-		let currentDate = `${date} ${d.custom_time}`;
+		let currentDate = `${date} ${d.time}`;
 		d.from_date = currentDate
 		frappe.model.set_value(cdt, cdn, 'from_time', currentDate)
 		cur_frm.refresh_field('time_logs')
@@ -10,7 +10,7 @@ frappe.ui.form.on('Timesheet Detail', {
 	date: function(frm, cdt, cdn) {
 		let d = locals[cdt][cdn];
 		let date = d.date
-		let currentDate = `${date} ${d.custom_time}`;
+		let currentDate = `${date} ${d.time}`;
 		console.log(currentDate)
 		d.from_date = currentDate
 		frappe.model.set_value(cdt, cdn, 'from_time', currentDate)
@@ -34,7 +34,7 @@ frappe.ui.form.on('Timesheet', {
 				primary_action: function () {
 					var data = d.get_values();
 					var to_time = frm.doc.time_logs[frm.doc.time_logs.length - 1]['to_time']
-					var time = frm.doc.time_logs[frm.doc.time_logs.length - 1]['custom_time']
+					var time = frm.doc.time_logs[frm.doc.time_logs.length - 1]['time']
 					if(data.break_time == "Add 15 Mins Break"){
 					var min = 15
 					var hour = 0.25
@@ -64,7 +64,7 @@ frappe.ui.form.on('Timesheet', {
 								let row = frm.add_child("time_logs");
 								row.from_time = to_time
 								row.to_time = r.message[0];
-								row.custom_time = r.message[1];
+								row.time = r.message[1];
 								row.hours=hour;
 								cur_frm.refresh_field('time_logs')
 								d.hide();
