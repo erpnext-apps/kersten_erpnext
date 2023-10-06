@@ -40,9 +40,16 @@ app_license = "MIT"
 
 # Home Pages
 # ----------
-
+doctype_js = {
+    "Timesheet": "public/js/timesheet.js",
+                }
 # application home page (will override Website Settings)
 # home_page = "login"
+doc_events = {
+	"Timesheet": {
+		"validate": "kersten_erpnext.kersten_erpnext.timesheet.set_hours_and_to_time",
+	}
+}
 
 update_website_context = ["kersten_erpnext.templates.generators.item.item.set_page_blocks"]
 
