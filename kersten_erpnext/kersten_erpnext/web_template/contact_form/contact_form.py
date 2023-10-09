@@ -157,8 +157,9 @@ def make_customer(source_name, target_doc=None, ignore_permissions=True):
 			target.customer_type = "Individual"
 			target.customer_name = source.lead_name
 
-		target.customer_group = frappe.db.get_default("Customer Group")
-
+		target.customer_group = 'Account Sales'
+		target.territory ="All Territories"
+		
 	doclist = get_mapped_doc(
 		"Lead",
 		source_name,
