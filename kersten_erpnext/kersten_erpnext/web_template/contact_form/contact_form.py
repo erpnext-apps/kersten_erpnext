@@ -78,6 +78,7 @@ def send_message(sender, message, first_name = None, last_name = None, mobile_no
 		contact.first_name = first_name
 		contact.last_name = last_name
 		contact.email_id = sender
+		contact.mobile_no = mobile_no
 		contact.append("email_ids",{
 			"email_id":sender
 		})
