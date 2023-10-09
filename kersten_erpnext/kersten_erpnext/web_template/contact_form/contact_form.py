@@ -121,7 +121,7 @@ def make_opportunity(source_name, target_doc=None):
 		ignore_permissions=True
 	)
 
-	return target_doc
+	target_doc.save(ignore_permissions=True)
 	
 
 def add_comment(reference_doctype: str, reference_name: str, content: str, comment_email: str, comment_by: str):
