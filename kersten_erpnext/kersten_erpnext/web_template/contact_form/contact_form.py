@@ -7,9 +7,10 @@ import frappe
 from frappe import _
 from frappe.rate_limiter import rate_limit
 from frappe.utils import validate_email_address
-from frappe.desk.form.utils import add_comment
-from erpnext.crm.doctype.lead.lead import make_opportunity
 from frappe.model.mapper import get_mapped_doc
+from frappe.core.doctype.file.utils import extract_images_from_html
+from frappe.desk.form.document_follow import follow_document
+
 
 
 sitemap = 1
@@ -56,7 +57,7 @@ def send_message(sender, message, first_name = None, last_name = None, mobile_no
 		doc.party_name = contact_data[0].link_name
 		doc.contact_mobile = mobile_no
 		doc.contact_email = sender
-		doc.save()
+		doc.save(ignore_permissions = True)
 		add_comment("Opportunity" , doc.name , content=message , comment_email = sender, comment_by = None) 
 	
 	contact_but_no_customer = frappe.db.sql(f""" Select co.name  From `tabContact` as co
@@ -71,41 +72,52 @@ def send_message(sender, message, first_name = None, last_name = None, mobile_no
 		doc.email_id = sender
 		doc.mobile_no = mobile_no
 		doc.company_name = organisation_name
-		doc.save()
+		doc.save(ignore_permissions = True)
 		add_comment("Lead" , doc.name , content=message , comment_email = sender, comment_by = None) 
 		
 		make_opportunity(doc.name)
 		make_customer(doc.name)
 
-
+@frappe.whitelist(allow_guest=True)
 def make_opportunity(source_name, target_doc=None):
+	doc =frappe.get_doc("Lead" , source_name)
 	def set_missing_values(source, target):
 		_set_missing_values(source, target)
+	target_doc = frappe.new_doc("Opportunity")
+	target_doc.campaign = doc.campaign_name
+	target_doc.opportunity_from ="Lead"
+	target_doc.party_name = doc.name
+	target_doc.contact_display = doc.lead_name
+	target_doc.customer_name = doc.company_name
+	target_doc.contact_email = doc.email_id
+	target_doc.contact_mobile = doc.mobile_no
+	target_doc.opportunity_owner = doc.lead_owner
+	target_doc.notes = doc.notes
+	target_doc.save(ignore_permissions = True)
+	
 
-	target_doc = get_mapped_doc(
-		"Lead",
-		source_name,
+def add_comment(reference_doctype: str, reference_name: str, content: str, comment_email: str, comment_by: str):
+	reference_doc = frappe.get_doc(reference_doctype, reference_name)
+
+	comment = frappe.new_doc("Comment")
+	comment.update(
 		{
-			"Lead": {
-				"doctype": "Opportunity",
-				"field_map": {
-					"campaign_name": "campaign",
-					"doctype": "opportunity_from",
-					"name": "party_name",
-					"lead_name": "contact_display",
-					"company_name": "customer_name",
-					"email_id": "contact_email",
-					"mobile_no": "contact_mobile",
-					"lead_owner": "opportunity_owner",
-					"notes": "notes",
-				},
-			}
-		},
-		target_doc,
-		set_missing_values,
+			"comment_type": "Comment",
+			"reference_doctype": reference_doctype,
+			"reference_name": reference_name,
+			"comment_email": comment_email,
+			"comment_by": comment_by,
+			"content": extract_images_from_html(reference_doc, content, is_private=True),
+		}
 	)
+	comment.insert(ignore_permissions=True)
 
-	target_doc.save()
+	if frappe.get_cached_value("User", frappe.session.user, "follow_commented_documents"):
+		follow_document(comment.reference_doctype, comment.reference_name, frappe.session.user)
+
+	return comment
+
+
 
 def _set_missing_values(source, target):
 	address = frappe.get_all(
@@ -166,4 +178,4 @@ def make_customer(source_name, target_doc=None, ignore_permissions=True):
 		set_missing_values,
 		ignore_permissions=ignore_permissions,
 	)
-	doclist.save()
+	doclist.save(ignore_permissions = True)
