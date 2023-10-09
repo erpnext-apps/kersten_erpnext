@@ -80,7 +80,8 @@ def send_message(sender, message, first_name = None, last_name = None, mobile_no
 		contact.email_id = sender
 		contact.mobile_no = mobile_no
 		contact.append("email_ids",{
-			"email_id":sender
+			"email_id":sender,
+			"is_primary":1
 		})
 		contact.append("links",{
 			"link_doctype":"Lead",
