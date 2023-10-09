@@ -85,7 +85,7 @@ def send_message(sender, message, first_name = None, last_name = None, mobile_no
 			"link_doctype":"Lead",
 			"link_name":doc.name
 		})
-
+		contact.save(ignore_permissions=True)
 
 		make_opportunity(doc.name)
 		make_customer(doc.name)
