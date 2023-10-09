@@ -73,27 +73,53 @@ def send_message(sender, message, first_name = None, last_name = None, mobile_no
 		doc.mobile_no = mobile_no
 		doc.company_name = organisation_name
 		doc.save(ignore_permissions = True)
-		add_comment("Lead" , doc.name , content=message , comment_email = sender, comment_by = None) 
-		
+		add_comment("Lead" , doc.name , content=message , comment_email = sender, comment_by = None)
+		contact = frappe.new_doc("Contact")
+		contact.first_name = first_name
+		contact.last_name = last_name
+		contact.email_id = sender
+		contact.append("email_ids",{
+			"email_id":sender
+		})
+		contact.append("links",{
+			"link_doctype":"Lead",
+			"link_name":doc.name
+		})
+
+
 		make_opportunity(doc.name)
 		make_customer(doc.name)
 
 @frappe.whitelist(allow_guest=True)
 def make_opportunity(source_name, target_doc=None):
-	doc =frappe.get_doc("Lead" , source_name)
 	def set_missing_values(source, target):
 		_set_missing_values(source, target)
-	target_doc = frappe.new_doc("Opportunity")
-	target_doc.campaign = doc.campaign_name
-	target_doc.opportunity_from ="Lead"
-	target_doc.party_name = doc.name
-	target_doc.contact_display = doc.lead_name
-	target_doc.customer_name = doc.company_name
-	target_doc.contact_email = doc.email_id
-	target_doc.contact_mobile = doc.mobile_no
-	target_doc.opportunity_owner = doc.lead_owner
-	target_doc.notes = doc.notes
-	target_doc.save(ignore_permissions = True)
+
+	target_doc = get_mapped_doc(
+		"Lead",
+		source_name,
+		{
+			"Lead": {
+				"doctype": "Opportunity",
+				"field_map": {
+					"campaign_name": "campaign",
+					"doctype": "opportunity_from",
+					"name": "party_name",
+					"lead_name": "contact_display",
+					"company_name": "customer_name",
+					"email_id": "contact_email",
+					"mobile_no": "contact_mobile",
+					"lead_owner": "opportunity_owner",
+					"notes": "notes",
+				},
+			}
+		},
+		target_doc,
+		set_missing_values,
+		ignore_permissions=True
+	)
+
+	return target_doc
 	
 
 def add_comment(reference_doctype: str, reference_name: str, content: str, comment_email: str, comment_by: str):
