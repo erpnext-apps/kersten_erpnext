@@ -87,6 +87,10 @@ def send_message(sender, message, first_name = None, last_name = None, mobile_no
 			"link_doctype":"Lead",
 			"link_name":doc.name
 		})
+		contact.append("phone_nos",{
+			"phone":mobile_no,
+			"is_primary_phone":1
+		})
 		contact.save(ignore_permissions=True)
 
 		make_opportunity(doc.name)
