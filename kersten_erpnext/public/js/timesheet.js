@@ -35,7 +35,7 @@ frappe.ui.form.on('Timesheet', {
 					var data = d.get_values();
 					var to_time = frm.doc.time_logs[frm.doc.time_logs.length - 1]['to_time']
 					if (!to_time){
-						frappe.throw("Please Add To Time In Last Row")
+						frappe.throw(`Please Add To Time In Row#${frm.doc.time_logs.length}`)
 					}
 					var time = frm.doc.time_logs[frm.doc.time_logs.length - 1]['time']
 					if(data.break_time == "Add 15 Mins Break"){
@@ -71,6 +71,7 @@ frappe.ui.form.on('Timesheet', {
 								row.hours=hour;
 								cur_frm.refresh_field('time_logs')
 								d.hide();
+								frappe.msgprint(`Added break from ${to_time} to ${r.message[0]} in row number ${row.idx}.`)
 							}
 							
 						}
