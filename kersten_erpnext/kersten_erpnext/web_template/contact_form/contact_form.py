@@ -93,8 +93,8 @@ def send_message(sender, message, first_name = None, last_name = None, mobile_no
 		})
 		contact.save(ignore_permissions=True)
 
-		make_opportunity(doc.name)
-		make_customer(doc.name)
+		opportunity = make_opportunity(doc.name)
+		make_customer(doc.name , opportunity)
 
 @frappe.whitelist(allow_guest=True)
 def make_opportunity(source_name, target_doc=None):
@@ -126,6 +126,7 @@ def make_opportunity(source_name, target_doc=None):
 	)
 
 	target_doc.save(ignore_permissions=True)
+	return target_doc.name
 	
 
 def add_comment(reference_doctype: str, reference_name: str, content: str, comment_email: str, comment_by: str):
@@ -180,7 +181,7 @@ def _set_missing_values(source, target):
 	if contact:
 		target.contact_person = contact[0].parent
 
-def make_customer(source_name, target_doc=None, ignore_permissions=True):
+def make_customer(source_name, opportunity, target_doc=None, ignore_permissions=True):
 	def set_missing_values(source, target):
 		if source.company_name:
 			target.customer_type = "Company"
@@ -191,6 +192,7 @@ def make_customer(source_name, target_doc=None, ignore_permissions=True):
 
 		target.customer_group = 'Account Sales'
 		target.territory ="All Territories"
+		target.opportunity_name = opportunity
 		
 	doclist = get_mapped_doc(
 		"Lead",
