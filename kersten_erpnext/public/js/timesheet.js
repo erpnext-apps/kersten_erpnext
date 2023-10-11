@@ -68,6 +68,7 @@ frappe.ui.form.on('Timesheet', {
 								row.from_time = to_time
 								row.to_time = r.message[0];
 								row.hours=hour;
+								row.activity_type = "Break Time";
 								cur_frm.refresh_field('time_logs')
 								d.hide();
 								frappe.msgprint(`Added break from ${to_time} to ${r.message[0]} in row number ${row.idx}.`)
