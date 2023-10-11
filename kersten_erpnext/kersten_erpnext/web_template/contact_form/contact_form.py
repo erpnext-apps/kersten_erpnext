@@ -66,14 +66,23 @@ def send_message(sender, message, first_name = None, last_name = None, mobile_no
 											""",as_dict = 1)
 	
 	if not contact_but_no_customer:
-		doc = frappe.new_doc("Lead")
-		doc.first_name = first_name
-		doc.last_name = last_name
-		doc.email_id = sender
-		doc.mobile_no = mobile_no
-		doc.company_name = organisation_name
-		doc.save(ignore_permissions = True)
-		add_comment("Lead" , doc.name , content=message , comment_email = sender, comment_by = None)
+		customer = frappe.new_doc("Customer")
+		customer.customer_name=organisation_name
+		customer.customer_type="Company"
+		customer.customer_group="Account Sales"
+		customer.territory="All Territories"
+		customer.save(ignore_permissions = True)
+ 		
+		opportunity = frappe.new_doc("Opportunity")
+		opportunity.opportunity_from = "Customer"
+		opportunity.party_name = customer.name
+		opportunity.contact_email = sender
+		opportunity.contact_mobile = mobile_no
+		opportunity.source = ""
+		opportunity.save(ignore_permissions = True)
+		frappe.db.set_value("Customer" , customer.name , 'opportunity_name' , opportunity.name , update_modified=False)
+		add_comment(reference_doctype = "Opportunity", reference_name=opportunity.name, content = message, comment_email=sender, comment_by = frappe.session.user)
+		
 		contact = frappe.new_doc("Contact")
 		contact.first_name = first_name
 		contact.last_name = last_name
@@ -84,49 +93,49 @@ def send_message(sender, message, first_name = None, last_name = None, mobile_no
 			"is_primary":1
 		})
 		contact.append("links",{
-			"link_doctype":"Lead",
-			"link_name":doc.name
+			"link_doctype":"Customer",
+			"link_name":customer.name
 		})
 		contact.append("phone_nos",{
 			"phone":mobile_no,
 			"is_primary_phone":1
 		})
 		contact.save(ignore_permissions=True)
+		
+# 		opportunity = make_opportunity(doc.name)
+# 		make_customer(doc.name , opportunity)
 
-		opportunity = make_opportunity(doc.name)
-		make_customer(doc.name , opportunity)
+# @frappe.whitelist(allow_guest=True)
+# def make_opportunity(source_name, target_doc=None):
+# 	def set_missing_values(source, target):
+# 		_set_missing_values(source, target)
 
-@frappe.whitelist(allow_guest=True)
-def make_opportunity(source_name, target_doc=None):
-	def set_missing_values(source, target):
-		_set_missing_values(source, target)
+# 	target_doc = get_mapped_doc(
+# 		"Lead",
+# 		source_name,
+# 		{
+# 			"Lead": {
+# 				"doctype": "Opportunity",
+# 				"field_map": {
+# 					"campaign_name": "campaign",
+# 					"doctype": "opportunity_from",
+# 					"name": "party_name",
+# 					"lead_name": "contact_display",
+# 					"company_name": "customer_name",
+# 					"email_id": "contact_email",
+# 					"mobile_no": "contact_mobile",
+# 					"lead_owner": "opportunity_owner",
+# 					"notes": "notes",
+# 				},
+# 			}
+# 		},
+# 		target_doc,
+# 		set_missing_values,
+# 		ignore_permissions=True
+# 	)
 
-	target_doc = get_mapped_doc(
-		"Lead",
-		source_name,
-		{
-			"Lead": {
-				"doctype": "Opportunity",
-				"field_map": {
-					"campaign_name": "campaign",
-					"doctype": "opportunity_from",
-					"name": "party_name",
-					"lead_name": "contact_display",
-					"company_name": "customer_name",
-					"email_id": "contact_email",
-					"mobile_no": "contact_mobile",
-					"lead_owner": "opportunity_owner",
-					"notes": "notes",
-				},
-			}
-		},
-		target_doc,
-		set_missing_values,
-		ignore_permissions=True
-	)
-
-	target_doc.save(ignore_permissions=True)
-	return target_doc.name
+# 	target_doc.save(ignore_permissions=True)
+# 	return target_doc.name
 	
 
 def add_comment(reference_doctype: str, reference_name: str, content: str, comment_email: str, comment_by: str):
@@ -152,65 +161,65 @@ def add_comment(reference_doctype: str, reference_name: str, content: str, comme
 
 
 
-def _set_missing_values(source, target):
-	address = frappe.get_all(
-		"Dynamic Link",
-		{
-			"link_doctype": source.doctype,
-			"link_name": source.name,
-			"parenttype": "Address",
-		},
-		["parent"],
-		limit=1,
-	)
+# def _set_missing_values(source, target):
+# 	address = frappe.get_all(
+# 		"Dynamic Link",
+# 		{
+# 			"link_doctype": source.doctype,
+# 			"link_name": source.name,
+# 			"parenttype": "Address",
+# 		},
+# 		["parent"],
+# 		limit=1,
+# 	)
 
-	contact = frappe.get_all(
-		"Dynamic Link",
-		{
-			"link_doctype": source.doctype,
-			"link_name": source.name,
-			"parenttype": "Contact",
-		},
-		["parent"],
-		limit=1,
-	)
+# 	contact = frappe.get_all(
+# 		"Dynamic Link",
+# 		{
+# 			"link_doctype": source.doctype,
+# 			"link_name": source.name,
+# 			"parenttype": "Contact",
+# 		},
+# 		["parent"],
+# 		limit=1,
+# 	)
 
-	if address:
-		target.customer_address = address[0].parent
+# 	if address:
+# 		target.customer_address = address[0].parent
 
-	if contact:
-		target.contact_person = contact[0].parent
+# 	if contact:
+# 		target.contact_person = contact[0].parent
 
-def make_customer(source_name, opportunity, target_doc=None, ignore_permissions=True):
-	def set_missing_values(source, target):
-		if source.company_name:
-			target.customer_type = "Company"
-			target.customer_name = source.company_name
-		else:
-			target.customer_type = "Individual"
-			target.customer_name = source.lead_name
+# def make_customer(source_name, opportunity, target_doc=None, ignore_permissions=True):
+# 	def set_missing_values(source, target):
+# 		if source.company_name:
+# 			target.customer_type = "Company"
+# 			target.customer_name = source.company_name
+# 		else:
+# 			target.customer_type = "Individual"
+# 			target.customer_name = source.lead_name
 
-		target.customer_group = 'Account Sales'
-		target.territory ="All Territories"
-		target.opportunity_name = opportunity
+# 		target.customer_group = 'Account Sales'
+# 		target.territory ="All Territories"
+# 		target.opportunity_name = opportunity
 		
-	doclist = get_mapped_doc(
-		"Lead",
-		source_name,
-		{
-			"Lead": {
-				"doctype": "Customer",
-				"field_map": {
-					"name": "lead_name",
-					"company_name": "customer_name",
-					"contact_no": "phone_1",
-					"fax": "fax_1",
-				},
-				"field_no_map": ["disabled"],
-			}
-		},
-		target_doc,
-		set_missing_values,
-		ignore_permissions=ignore_permissions,
-	)
-	doclist.save(ignore_permissions = True)
+# 	doclist = get_mapped_doc(
+# 		"Lead",
+# 		source_name,
+# 		{
+# 			"Lead": {
+# 				"doctype": "Customer",
+# 				"field_map": {
+# 					"name": "lead_name",
+# 					"company_name": "customer_name",
+# 					"contact_no": "phone_1",
+# 					"fax": "fax_1",
+# 				},
+# 				"field_no_map": ["disabled"],
+# 			}
+# 		},
+# 		target_doc,
+# 		set_missing_values,
+# 		ignore_permissions=ignore_permissions,
+# 	)
+# 	doclist.save(ignore_permissions = True)
