@@ -4,7 +4,7 @@ from frappe.utils import flt
 
 def set_hours_and_to_time(self,method):
     for row in self.time_logs:
-        if not row.time:
+        if not row.time and row.activity_type != "Break Time":
             frappe.throw(f"#Row{row.idx}: Field Time is mandetory")
         date_str = row.date
         time_str = row.time
