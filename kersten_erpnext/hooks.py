@@ -137,9 +137,9 @@ update_website_context = ["kersten_erpnext.templates.generators.item.item.set_pa
 # Overriding Methods
 # ------------------------------
 #
-override_whitelisted_methods = {
-	"erpnext.e_commerce.shopping_cart.cart.create_lead_for_item_inquiry": "kersten_erpnext.api.create_lead_for_item_inquiry"
-}
+# override_whitelisted_methods = {
+# 	"erpnext.e_commerce.shopping_cart.cart.create_lead_for_item_inquiry": "kersten_erpnext.api.create_lead_for_item_inquiry"
+# }
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
